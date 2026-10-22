@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShiftBeasts</title>
+  <style>
+    body {
+      margin: 0;
+      background: #090d20;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    h1 { color: #42e8ff; }
+    .arena {
+      margin: 20px auto;
+      padding: 30px 10px;
+      max-width: 340px;
+      background: linear-gradient(#19274c, #101426);
+      border: 2px solid #42e8ff;
+      border-radius: 18px;
+    }
+    .car { font-size: 80px; margin: 20px; }
+    button {
+      padding: 14px 20px;
+      margin: 6px;
+      border: 0;
+      border-radius: 10px;
+      background: #42e8ff;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>⚡ ShiftBeasts</h1>
+  <p>Race together. Transform together.</p>
+  <div class="arena">
+    <h2>Training Mission 01</h2>
+    <div class="car" id="car">🏎️</div>
+    <p id="message">Ready, Beast Driver?</p>
+    <button onclick="shift()">BEAST SHIFT</button>
+    <button onclick="mission()">START MISSION</button>
+  </div>
+  <script>
+    let beast = false;
+    function shift() {
+      beast = !beast;
+      document.getElementById("car").textContent =
+        beast ? "🐺" : "🏎️";
+      document.getElementById("message").textContent =
+        beast ? "Beast Mode Activated!" : "Car Mode Activated!";
+    }
+    function mission() {
+      document.getElementById("message").textContent =
+        "Mission started! Avoid the obstacles!";
+    }
+  </script>
+</body>
+</html>
+      
