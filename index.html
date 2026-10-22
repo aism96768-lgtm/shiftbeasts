@@ -2,61 +2,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ShiftBeasts</title>
-  <style>
-    body {
-      margin: 0;
-      background: #090d20;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-    h1 { color: #42e8ff; }
-    .arena {
-      margin: 20px auto;
-      padding: 30px 10px;
-      max-width: 340px;
-      background: linear-gradient(#19274c, #101426);
-      border: 2px solid #42e8ff;
-      border-radius: 18px;
-    }
-    .car { font-size: 80px; margin: 20px; }
-    button {
-      padding: 14px 20px;
-      margin: 6px;
-      border: 0;
-      border-radius: 10px;
-      background: #42e8ff;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShiftBeasts Racing</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #080d20;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+h1 { color: #40eaff; margin: 14px 0 5px; }
+#score { font-size: 18px; margin: 10px; }
+#game {
+  position: relative;
+  width: min(94vw, 420px);
+  height: 58vh;
+  min-height: 350px;
+  max-height: 540px;
+  margin: 12px auto;
+  overflow: hidden;
+  border: 3px solid #40eaff;
+  border-radius: 14px;
+  background: #277a42;
+}
+#road {
+  position: absolute;
+  inset: 0;
+  left: 17%;
+  width: 66%;
+  background: #343945;
+  border-left: 5px solid #eee;
+  border-right: 5px solid #eee;
+}
+.line {
+  position: absolute;
+  top: -100px;
+  left: 33%;
+  width: 6px;
+  height: 70px;
+  background: #fff;
+  box-shadow: 0 110px #fff, 0 220px #fff,
+              0 330px #fff, 0 440px #fff,
+              0 550px #fff;
+}
+#car {
+  position: absolute;
+  z-index: 3;
+  bottom: 18px;
+  left: 42%;
+  width: 16%;
+  min-width: 48px;
+  font-size: 43px;
+  transition: left .12s;
+}
+.obstacle {
+  position: absolute;
+  z-index: 2;
+  top: -65px;
+  font-size: 34px;
+}
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  margin: 14px auto;
+}
+button {
+  background: #40eaff;
+  color: #071225;
+  border: 0;
+  border-radius: 12px;
+  padding: 16px 24px;
+  font-weight: bold;
+  font-size: 17px;
+  touch-action: manipulation;
+}
+#status { min-height: 25px; padding: 4px; }
+</style>
 </head>
 <body>
-  <h1>⚡ ShiftBeasts</h1>
-  <p>Race together. Transform together.</p>
-  <div class="arena">
-    <h2>Training Mission 01</h2>
-    <div class="car" id="car">🏎️</div>
-    <p id="message">Ready, Beast Driver?</p>
-    <button onclick="shift()">BEAST SHIFT</button>
-    <button onclick="mission()">START MISSION</button>
-  </div>
-  <script>
-    let beast = false;
-    function shift() {
-      beast = !beast;
-      document.getElementById("car").textContent =
-        beast ? "🐺" : "🏎️";
-      document.getElementById("message").textContent =
-        beast ? "Beast Mode Activated!" : "Car Mode Activated!";
+<h1>⚡ ShiftBeasts</h1>
+<div id="score">Distance: 0 m</div>
+
+<div id="game">
+  <div id="road"><div class="line"></div></div>
+  <div id="car">🏎️</div>
+</div>
+
+<div id="status">START dabao aur race shuru karo!</div>
+
+<div class="controls">
+  <button id="left">⬅️ LEFT</button>
+  <button id="right">RIGHT ➡️</button>
+</div>
+<button id="start">START RACE 🏁</button>
+
+<script>
+const car = document.getElementById("car");
+const game = document.getElementById("game");
+const statusText = document.getElementById("status");
+const scoreText = document.getElementById("score");
+
+let lane = 1;
+let running = false;
+let distance = 0;
+let lastTime = 0;
+let spawnTimer = 0;
+let obstacles = [];
+
+function moveCar(direction) {
+  if (!running) return;
+  lane = Math.max(0, Math.min(2, lane + direction));
+  car.style.left = [ "23%", "42%", "61%" ][lane];
+}
+
+document.getElementById("left").onclick =
+  () => moveCar(-1);
+document.getElementById("right").onclick =
+  () => moveCar(1);
+
+function startRace() {
+  obstacles.forEach(o => o.el.remove());
+  obstacles = [];
+  lane = 1;
+  distance = 0;
+  spawnTimer = 0;
+  lastTime = 0;
+  car.textContent = "🏎️";
+  car.style.left = "42%";
+  scoreText.textContent = "Distance: 0 m";
+  statusText.textContent = "Race shuru! Obstacles se bacho!";
+  running = true;
+  requestAnimationFrame(update);
+}
+
+function update(time) {
+  if (!running) return;
+
+  const dt = lastTime ? Math.min((time - lastTime) / 16.67, 3) : 1;
+  lastTime = time;
+  distance += dt * 0.15;
+  scoreText.textContent = "Distance: " + Math.floor(distance) + " m";
+
+  spawnTimer += dt;
+  if (spawnTimer > 65) {
+    spawnTimer = 0;
+    const laneNumber = Math.floor(Math.random() * 3);
+    const el = document.createElement("div");
+    el.className = "obstacle";
+    el.textContent = "🚧";
+    el.style.left = ["23%", "42%", "61%"][laneNumber];
+    game.appendChild(el);
+    obstacles.push({el, lane: laneNumber, y: -55});
+  }
+
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    const o = obstacles[i];
+    o.y += 4 * dt;
+    o.el.style.top = o.y + "px";
+
+    if (o.lane === lane && o.y > game.clientHeight - 100 &&
+        o.y < game.clientHeight - 15) {
+      running = false;
+      statusText.textContent =
+        "Crash! Distance: " + Math.floor(distance) + " m. Dobara khelo!";
+      return;
     }
-    function mission() {
-      document.getElementById("message").textContent =
-        "Mission started! Avoid the obstacles!";
+
+    if (o.y > game.clientHeight) {
+      o.el.remove();
+      obstacles.splice(i, 1);
     }
-  </script>
+  }
+
+  requestAnimationFrame(update);
+}
+
+document.getElementById("start").onclick = startRace;
+</script>
 </body>
 </html>
-      
