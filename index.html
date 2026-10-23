@@ -3,185 +3,254 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShiftBeasts Racing</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SHIFTBEASTS | Racing</title>
 <style>
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: #080d20;
-  color: white;
-  font-family: Arial, sans-serif;
-  text-align: center;
+*{box-sizing:border-box}
+body{margin:0;background:#070b14;color:white;
+font-family:Arial,sans-serif}
+button{cursor:pointer;font-weight:bold}
+.screen{min-height:100vh;padding:22px 18px;
+background:radial-gradient(ellipse at 75% 35%,
+#193a5b 0%,#10192b 38%,#070b14 75%)}
+header{display:flex;align-items:center;
+justify-content:space-between;gap:8px}
+.logo{font-size:24px;font-weight:900;font-style:italic;
+letter-spacing:-1px}
+.logo span{color:#16cfff}
+.tag{color:#9aaec3;font-size:10px;
+letter-spacing:3px;margin-top:7px}
+.pill{border:1px solid #294761;border-radius:20px;
+padding:8px;color:#9ddfff;font-size:11px}
+.hero{margin-top:52px}
+.kicker{color:#20cfff;font-size:11px;
+letter-spacing:4px;font-weight:bold}
+h1{font-size:clamp(35px,10vw,55px);
+line-height:1.02;margin:14px 0}
+h1 span{color:#25cfff}
+.sub{color:#b1c0d0;line-height:1.6;
+font-size:14px;max-width:300px}
+.carbox{position:relative;margin:28px -10px 20px;
+height:220px;display:flex;align-items:center;
+justify-content:center;overflow:hidden}
+.glow{position:absolute;width:85%;height:55px;
+bottom:28px;background:#087cff;
+filter:blur(40px);opacity:.5}
+.car{width:100%;max-width:410px;position:relative;
+z-index:1;filter:drop-shadow(0 18px 12px #000)}
+.specs{display:flex;justify-content:space-between;
+border-top:1px solid #26384b;
+border-bottom:1px solid #26384b;
+padding:14px 2px;margin-bottom:24px}
+.spec{font-size:10px;color:#859bb1;letter-spacing:1px}
+.spec b{display:block;color:white;font-size:15px;
+margin-top:5px}
+.actions{display:grid;gap:12px}
+.btn{width:100%;padding:17px;border-radius:5px;
+font-size:14px;letter-spacing:1px}
+.primary{background:#19c9ff;color:#04111c;border:0;
+box-shadow:0 0 22px #08bfff33}
+.secondary{background:#101b2a;color:white;
+border:1px solid #3b536a}
+.note{text-align:center;color:#687e94;
+font-size:10px;letter-spacing:2px;margin-top:25px}
+#gameScreen{display:none;text-align:center;padding:18px}
+#track{position:relative;height:60vh;min-height:350px;
+max-height:550px;overflow:hidden;
+background:#333b47;border:3px solid #42536a;
+width:100%;max-width:420px;margin:18px auto}
+#track:before{content:"";position:absolute;inset:0 16%;
+border-left:5px solid white;border-right:5px solid white;
+background:#252b34}
+.stripe{position:absolute;left:49%;top:-100px;width:5px;
+height:70px;background:white;
+box-shadow:0 120px white,0 240px white,
+0 360px white,0 480px white}
+#player{position:absolute;bottom:18px;left:42%;
+font-size:44px;z-index:2;transition:left .12s}
+.obstacle{position:absolute;top:-60px;font-size:30px}
+.controls{display:flex;gap:15px;justify-content:center}
+.controls button{padding:15px 25px;background:#16cfff;
+border:0;border-radius:5px}
+@media(min-width:600px){
+.screen{max-width:650px;margin:auto}
+.hero{margin-top:35px}
+.carbox{height:240px}
 }
-h1 { color: #40eaff; margin: 14px 0 5px; }
-#score { font-size: 18px; margin: 10px; }
-#game {
-  position: relative;
-  width: min(94vw, 420px);
-  height: 58vh;
-  min-height: 350px;
-  max-height: 540px;
-  margin: 12px auto;
-  overflow: hidden;
-  border: 3px solid #40eaff;
-  border-radius: 14px;
-  background: #277a42;
-}
-#road {
-  position: absolute;
-  inset: 0;
-  left: 17%;
-  width: 66%;
-  background: #343945;
-  border-left: 5px solid #eee;
-  border-right: 5px solid #eee;
-}
-.line {
-  position: absolute;
-  top: -100px;
-  left: 33%;
-  width: 6px;
-  height: 70px;
-  background: #fff;
-  box-shadow: 0 110px #fff, 0 220px #fff,
-              0 330px #fff, 0 440px #fff,
-              0 550px #fff;
-}
-#car {
-  position: absolute;
-  z-index: 3;
-  bottom: 18px;
-  left: 42%;
-  width: 16%;
-  min-width: 48px;
-  font-size: 43px;
-  transition: left .12s;
-}
-.obstacle {
-  position: absolute;
-  z-index: 2;
-  top: -65px;
-  font-size: 34px;
-}
-.controls {
-  display: flex;
-  justify-content: center;
-  gap: 22px;
-  margin: 14px auto;
-}
-button {
-  background: #40eaff;
-  color: #071225;
-  border: 0;
-  border-radius: 12px;
-  padding: 16px 24px;
-  font-weight: bold;
-  font-size: 17px;
-  touch-action: manipulation;
-}
-#status { min-height: 25px; padding: 4px; }
 </style>
 </head>
 <body>
-<h1>⚡ ShiftBeasts</h1>
-<div id="score">Distance: 0 m</div>
 
-<div id="game">
-  <div id="road"><div class="line"></div></div>
-  <div id="car">🏎️</div>
+<section class="screen" id="menu">
+<header>
+<div>
+<div class="logo">⚡ SHIFT<span>BEASTS</span></div>
+<div class="tag">RACE · SHIFT · SURVIVE</div>
+</div>
+<div class="pill">PROTOTYPE 01</div>
+</header>
+
+<div class="hero">
+<div class="kicker">THE STREETS ARE YOURS</div>
+<h1>BUILT TO<br><span>DOMINATE.</span></h1>
+<p class="sub">Push limits. Own the road.
+Enter the world of ShiftBeasts.</p>
 </div>
 
-<div id="status">START dabao aur race shuru karo!</div>
+<div class="carbox">
+<div class="glow"></div>
+<svg class="car" viewBox="0 0 500 230"
+xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="body" x1="0" y1="0" x2="0.2" y2="1">
+<stop stop-color="#3b5269"/>
+<stop offset=".35" stop-color="#101e31"/>
+<stop offset=".7" stop-color="#07101c"/>
+<stop offset="1" stop-color="#267db5"/>
+</linearGradient>
+<linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+<stop stop-color="#72dfff"/>
+<stop offset=".4" stop-color="#102d48"/>
+<stop offset="1" stop-color="#060d17"/>
+</linearGradient>
+</defs>
+<ellipse cx="250" cy="194" rx="200" ry="15"
+fill="#000" opacity=".65"/>
+<path d="M45 158 L70 130 130 111 181 65
+Q199 51 226 52 L307 65 363 106
+Q417 116 452 146 L462 169 430 181
+L74 181 38 171Z" fill="url(#body)"
+stroke="#66839d" stroke-width="2"/>
+<path d="M151 112 L196 70 Q207 62 229 64
+L265 68 285 110Z" fill="url(#glass)"
+stroke="#688aa5" stroke-width="2"/>
+<path d="M279 70 L301 74 353 111 295 110Z"
+fill="url(#glass)" stroke="#688aa5" stroke-width="2"/>
+<path d="M43 157 L112 135 149 139 119 152
+65 168Z" fill="#142a40"/>
+<path d="M353 131 L426 143 443 156 368 151Z"
+fill="#15293e"/>
+<path d="M61 147 L120 131 141 135 91 151Z"
+fill="#1ce1ff"/>
+<path d="M374 127 L420 140 438 150 388 143Z"
+fill="#1ce1ff"/>
+<path d="M170 119 L335 120" stroke="#7c9db7"
+stroke-width="2" opacity=".5"/>
+<path d="M160 151 L343 151" stroke="#12cfff"
+stroke-width="3"/>
+<path d="M211 163 L304 163" stroke="#526c82"
+stroke-width="3"/>
+<circle cx="131" cy="174" r="34" fill="#05080d"
+stroke="#596d80" stroke-width="4"/>
+<circle cx="131" cy="174" r="22" fill="#182433"
+stroke="#90a5b8" stroke-width="3"/>
+<circle cx="131" cy="174" r="8" fill="#36cfff"/>
+<circle cx="365" cy="174" r="34" fill="#05080d"
+stroke="#596d80" stroke-width="4"/>
+<circle cx="365" cy="174" r="22" fill="#182433"
+stroke="#90a5b8" stroke-width="3"/>
+<circle cx="365" cy="174" r="8" fill="#36cfff"/>
+<path d="M200 132 L283 132" stroke="#e5f7ff"
+stroke-width="2" opacity=".6"/>
+<path d="M75 183 L424 183" stroke="#11cfff"
+stroke-width="3"/>
+</svg>
+</div>
 
+<div class="specs">
+<div class="spec">DRIVE<b>STREET</b></div>
+<div class="spec">ENGINE<b>V8 TURBO</b></div>
+<div class="spec">MODE<b>BEAST READY</b></div>
+</div>
+
+<div class="actions">
+<button class="btn primary" onclick="startGame()">
+▶ &nbsp; START RACING
+</button>
+<button class="btn secondary" onclick="chooseCar()">
+SELECT CAR
+</button>
+<button class="btn secondary" onclick="alert('Settings coming soon!')">
+SETTINGS
+</button>
+</div>
+<div class="note">NO LIMITS. NO FEAR. JUST SPEED.</div>
+</section>
+
+<section id="gameScreen">
+<h2>SHIFTBEASTS RACING</h2>
+<div id="distance">DISTANCE: 0 M</div>
+<div id="track">
+<div class="stripe"></div>
+<div id="player">🏎️</div>
+</div>
+<div id="status">Avoid the barriers!</div>
 <div class="controls">
-  <button id="left">⬅️ LEFT</button>
-  <button id="right">RIGHT ➡️</button>
+<button onclick="move(-1)">⬅ LEFT</button>
+<button onclick="move(1)">RIGHT ➡</button>
 </div>
-<button id="start">START RACE 🏁</button>
+<br>
+<button class="btn secondary" onclick="backMenu()">BACK TO MENU</button>
+</section>
 
 <script>
-const car = document.getElementById("car");
-const game = document.getElementById("game");
-const statusText = document.getElementById("status");
-const scoreText = document.getElementById("score");
-
-let lane = 1;
-let running = false;
-let distance = 0;
-let lastTime = 0;
-let spawnTimer = 0;
-let obstacles = [];
-
-function moveCar(direction) {
-  if (!running) return;
-  lane = Math.max(0, Math.min(2, lane + direction));
-  car.style.left = [ "23%", "42%", "61%" ][lane];
+let lane=1,playing=false,dist=0,last=0,timer=0,items=[];
+const $=id=>document.getElementById(id);
+function startGame(){
+$("menu").style.display="none";
+$("gameScreen").style.display="block";
+items.forEach(x=>x.el.remove());items=[];
+lane=1;dist=0;timer=0;last=0;playing=true;
+$("player").style.left="42%";
+$("status").textContent="Race started! Avoid barriers!";
+requestAnimationFrame(loop);
 }
-
-document.getElementById("left").onclick =
-  () => moveCar(-1);
-document.getElementById("right").onclick =
-  () => moveCar(1);
-
-function startRace() {
-  obstacles.forEach(o => o.el.remove());
-  obstacles = [];
-  lane = 1;
-  distance = 0;
-  spawnTimer = 0;
-  lastTime = 0;
-  car.textContent = "🏎️";
-  car.style.left = "42%";
-  scoreText.textContent = "Distance: 0 m";
-  statusText.textContent = "Race shuru! Obstacles se bacho!";
-  running = true;
-  requestAnimationFrame(update);
+function move(d){
+if(!playing)return;
+lane=Math.max(0,Math.min(2,lane+d));
+$("player").style.left=["23%","42%","61%"][lane];
 }
-
-function update(time) {
-  if (!running) return;
-
-  const dt = lastTime ? Math.min((time - lastTime) / 16.67, 3) : 1;
-  lastTime = time;
-  distance += dt * 0.15;
-  scoreText.textContent = "Distance: " + Math.floor(distance) + " m";
-
-  spawnTimer += dt;
-  if (spawnTimer > 65) {
-    spawnTimer = 0;
-    const laneNumber = Math.floor(Math.random() * 3);
-    const el = document.createElement("div");
-    el.className = "obstacle";
-    el.textContent = "🚧";
-    el.style.left = ["23%", "42%", "61%"][laneNumber];
-    game.appendChild(el);
-    obstacles.push({el, lane: laneNumber, y: -55});
-  }
-
-  for (let i = obstacles.length - 1; i >= 0; i--) {
-    const o = obstacles[i];
-    o.y += 4 * dt;
-    o.el.style.top = o.y + "px";
-
-    if (o.lane === lane && o.y > game.clientHeight - 100 &&
-        o.y < game.clientHeight - 15) {
-      running = false;
-      statusText.textContent =
-        "Crash! Distance: " + Math.floor(distance) + " m. Dobara khelo!";
-      return;
-    }
-
-    if (o.y > game.clientHeight) {
-      o.el.remove();
-      obstacles.splice(i, 1);
-    }
-  }
-
-  requestAnimationFrame(update);
+function loop(t){
+if(!playing)return;
+let dt=last?Math.min((t-last)/16.67,3):1;
+last=t;dist+=dt*.15;
+$("distance").textContent="DISTANCE: "+Math.floor(dist)+" M";
+timer+=dt;
+if(timer>65){
+timer=0;
+let n=Math.floor(Math.random()*3);
+let el=document.createElement("div");
+el.className="obstacle";el.textContent="🚧";
+el.style.left=["23%","42%","61%"][n];
+$("track").appendChild(el);items.push({el,lane:n,y:-55});
 }
-
-document.getElementById("start").onclick = startRace;
+for(let i=items.length-1;i>=0;i--){
+let o=items[i];o.y+=4*dt;
+o.el.style.top=o.y+"px";
+if(o.lane===lane&&o.y>$("track").clientHeight-100
+&&o.y<$("track").clientHeight-15){
+playing=false;
+$("status").textContent="CRASH! Tap START RACING to retry.";
+return;
+}
+if(o.y>$("track").clientHeight){
+o.el.remove();items.splice(i,1);
+}
+}
+requestAnimationFrame(loop);
+}
+function backMenu(){
+playing=false;$("gameScreen").style.display="none";
+$("menu").style.display="block";
+}
+function chooseCar(){
+let c=prompt("Choose car: 1 = Supercar, 2 = Beast");
+if(c==="2"){
+$("player").textContent="🐺";
+}else if(c==="1"){
+$("player").textContent="🏎️";
+}
+}
 </script>
 </body>
 </html>
