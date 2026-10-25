@@ -85,11 +85,13 @@ box(13,0.12,400,0,0,-100,roadMat);
 box(1.2,0.2,400,-7.1,0,-100,sidewalkMat);
 box(1.2,0.2,400,7.1,0,-100,sidewalkMat);
 
-// Road centre dashes
-for(let z=12;z>-390;z-=10){
-  box(0.16,0.04,4,0,0.09,z,lineMat);
-}
+const roadDashes = [];
 
+for (let z = 12; z > -390; z -= 10) {
+  const dash = box(0.16, 0.04, 4, 0, 0.09, z, lineMat);
+  roadDashes.push(dash);
+}
+  
 // City buildings on both sides
 const buildingMats=[
   0xb7a18a,0x8e9eac,0xd1c4ac,
