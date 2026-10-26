@@ -80,10 +80,11 @@ function box(w,h,d,x,y,z,mat,parent=scene) {
 }
 
 // Ground and long city road
-box(500,0.2,500,0,-0.2,0,grassMat);
-box(13,0.12,400,0,0,-100,roadMat);
-box(1.2,0.2,400,-7.1,0,-100,sidewalkMat);
-box(1.2,0.2,400,7.1,0,-100,sidewalkMat);
+
+box(10000, 0.2, 10000, 0, -0.2, -4900, grassMat);
+box(13, 0.12, 10000, 0, 0, -4900, roadMat);
+box(1.2, 0.2, 10000, -7.1, 0, -4900, sidewalkMat);
+box(1.2, 0.2, 10000, 7.1, 0, -4900, sidewalkMat);
 
 const roadDashes = [];
 
@@ -93,34 +94,53 @@ for (let z = 12; z > -390; z -= 10) {
 }
   
 // City buildings on both sides
-const buildingMats=[
-  0xb7a18a,0x8e9eac,0xd1c4ac,
-  0x9aabb4,0xb8b9b0,0x777f8e,
+
+const buildingMats = [
+  0xb7a18a, 0x8e9eac, 0xd1c4ac,
+  0x9aabb4, 0xb8b9b0, 0x777f8e,
   0xd6b79a
 ].map(material);
 
-for(let z=8;z>-330;z-=19){
-  for(const side of [-1,1]){
-    const w=5+Math.random()*5;
-    const h=7+Math.random()*20;
-    const d=7+Math.random()*6;
-    const x=side*(10+w/2+Math.random()*4);
-    const b=box(w,h,d,x,h/2,z+(Math.random()*5),
-      buildingMats[Math.floor(Math.random()*buildingMats.length)]);
-    b.userData.building=true;
+const cityRows = [];
 
-    // Simple rows of windows
-    const winMat=material(0x83c8d9);
-    for(let floor=1;floor<h/2;floor++){
-      for(let col=0;col<2;col++){
-        box(0.8,0.65,0.07,
-          x-w/2+1.3+col*(w-2.6),
-          floor*2.1,
-          b.position.z+d/2+0.04,
-          winMat);
+function makeCityRow(z) {
+  const row = new THREE.Group();
+  row.position.z = z;
+  scene.add(row);
+
+  const winMat = material(0x83c8d9);
+
+  for (const side of [-1, 1]) {
+    const w = 5 + Math.random() * 5;
+    const h = 8 + Math.random() * 12;
+    const d = 8 + Math.random() * 5;
+    const x = side * (10 + w / 2 + Math.random() * 3);
+
+    box(
+      w, h, d, x, h / 2, 0,
+      buildingMats[Math.floor(Math.random() * buildingMats.length)],
+      row
+    );
+
+    for (let floor = 1; floor < h / 2; floor++) {
+      for (let col = 0; col < 2; col++) {
+        box(
+          0.8, 0.7, 0.08,
+          x - w / 2 + 1.3 + col * (w - 2.6),
+          floor * 2.1,
+          d / 2 + 0.05,
+          winMat,
+          row
+        );
       }
     }
   }
+
+  cityRows.push(row);
+}
+
+for (let z = 5; z > -410; z -= 22) {
+  makeCityRow(z);
 }
 
 // Car group
