@@ -93,26 +93,28 @@ for (let z = 12; z > -390; z -= 10) {
   roadDashes.push(dash);
 }
   
-// City buildings on both sides
 
+ // City buildings, trees and streetlights
 const buildingMats = [
-  0xb7a18a, 0x8e9eac, 0xd1c4ac,
-  0x9aabb4, 0xb8b9b0, 0x777f8e,
-  0xd6b79a
+  0x8b969f, 0xb8a18b, 0x596b7a,
+  0xc3b7a2, 0x777f8e, 0x9aabb4
 ].map(material);
 
 const cityRows = [];
+const winMat = material(0x83c8d9);
+const poleMat = material(0x252b32);
+const lampMat = material(0xffe3a0);
+const leafMat = material(0x315c42);
+const trunkMat = material(0x59402d);
 
 function makeCityRow(z) {
   const row = new THREE.Group();
   row.position.z = z;
   scene.add(row);
 
-  const winMat = material(0x83c8d9);
-
   for (const side of [-1, 1]) {
     const w = 5 + Math.random() * 5;
-    const h = 8 + Math.random() * 12;
+    const h = 10 + Math.random() * 16;
     const d = 8 + Math.random() * 5;
     const x = side * (10 + w / 2 + Math.random() * 3);
 
@@ -122,7 +124,8 @@ function makeCityRow(z) {
       row
     );
 
-    for (let floor = 1; floor < h / 2; floor++) {
+    // Building windows
+    for (let floor = 1; floor < h / 2; floor += 2) {
       for (let col = 0; col < 2; col++) {
         box(
           0.8, 0.7, 0.08,
@@ -134,14 +137,40 @@ function makeCityRow(z) {
         );
       }
     }
+
+    // Streetlights beside the road
+    box(0.14, 4.5, 0.14, side * 8.1, 2.25, 0, poleMat, row);
+    box(0.85, 0.12, 0.12, side * 7.75, 4.4, 0, poleMat, row);
+    box(0.35, 0.14, 0.28, side * 7.4, 4.35, 0, lampMat, row);
+
+    // Trees on every third city row
+    if (Math.round(Math.abs(z) / 22) % 3 === 0) {
+      const treeX = side * 8.8;
+
+      const trunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.18, 0.25, 2, 6),
+        trunkMat
+      );
+      trunk.position.set(treeX, 1, 5);
+      row.add(trunk);
+
+      const leaves = new THREE.Mesh(
+        new THREE.SphereGeometry(1.25, 7, 6),
+        leafMat
+      );
+      leaves.position.set(treeX, 2.8, 5);
+      row.add(leaves);
+    }
   }
 
   cityRows.push(row);
 }
 
-for (let z = 5; z > -410; z -= 22) {
+// Extend the city farther into the distance
+for (let z = 5; z > -1300; z -= 22) {
   makeCityRow(z);
 }
+
 
 // Car group
 const car = new THREE.Group();
