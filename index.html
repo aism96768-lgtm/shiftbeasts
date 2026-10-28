@@ -94,22 +94,52 @@ for (let z = 12; z > -390; z -= 10) {
 }
   
 
- // City buildings, trees and streetlights
 
 const buildingMats = [
-  0x263447,
-  0x48566a,
-  0x7c8794,
-  0x9a8f83,
-  0x3d5963,
-  0x59616d
-].map(material);
+  0x303e50, // midnight blue
+  0x596979, // steel grey
+  0x9a8875, // warm stone
+  0x354e59, // deep teal
+  0xb0b4b8, // silver concrete
+  0x454958  // graphite
+].map(color => new THREE.MeshStandardMaterial({
+  color,
+  roughness: 0.72,
+  metalness: 0.12
+}));
+
 const cityRows = [];
-const winMat = material(0x83c8d9);
-const poleMat = material(0x252b32);
-const lampMat = material(0xffe3a0);
-const leafMat = material(0x315c42);
-const trunkMat = material(0x59402d);
+
+const winMat = new THREE.MeshStandardMaterial({
+  color: 0x9be7ff,
+  emissive: 0x236a91,
+  emissiveIntensity: 0.45,
+  metalness: 0.25,
+  roughness: 0.22
+});
+
+const darkGlass = new THREE.MeshStandardMaterial({
+  color: 0x142b40,
+  metalness: 0.55,
+  roughness: 0.2
+});
+
+const balconyMat = material(0x263544);
+const shopMat = material(0x202c38);
+const signMat = new THREE.MeshStandardMaterial({
+  color: 0xffbd68,
+  emissive: 0x9b5018,
+  emissiveIntensity: 0.5
+});
+
+const poleMat = material(0x26303b);
+const lampMat = new THREE.MeshStandardMaterial({
+  color: 0xffe4a1,
+  emissive: 0xffb64d,
+  emissiveIntensity: 1.2
+});
+const leafMat = material(0x285b43);
+const trunkMat = material(0x60432e);
 
 function makeCityRow(z) {
   const row = new THREE.Group();
@@ -117,16 +147,141 @@ function makeCityRow(z) {
   scene.add(row);
 
   for (const side of [-1, 1]) {
-    const w = 5 + Math.random() * 5;
-    const h = 10 + Math.random() * 16;
-    const d = 8 + Math.random() * 5;
-    const x = side * (10 + w / 2 + Math.random() * 3);
+    const w = 7 + Math.random() * 5;
+    const h = 13 + Math.random() * 17;
+    const d = 9 + Math.random() * 5;
+    const x = side * (11 + w / 2 + Math.random() * 3);
 
+    // Main building
     box(
       w, h, d, x, h / 2, 0,
       buildingMats[Math.floor(Math.random() * buildingMats.length)],
       row
     );
+
+    // Road-facing glass windows and balconies
+    const faceX = x - side * (w / 2 + 0.06);
+    const floors = Math.floor(h / 2.5);
+
+    for (let floor = 1; floor < floors; floor++) {
+      for (let col = 0; col < 3; col++) {
+        const winZ = -d / 2 + 1.6 + col * ((d - 3.2) / 2);
+        const winY = floor * 2.35;
+
+        box(
+          0.09, 1.25, 1.15,
+          faceX, winY, winZ,
+          darkGlass, row
+        );
+
+        box(
+          0.12, 0.88, 0.82,
+          faceX - side * 0.07, winY, winZ,
+          winMat, row
+        );
+
+        // Balcony slab
+        if (floor % 2 === 0 && col !== 1) {
+          box(
+            0.5, 0.12, 1.55,
+            faceX - side * 0.2,
+            winY - 0.72, winZ,
+            balconyMat, row
+          );
+
+          box(
+            0.08, 0.48, 1.5,
+            faceX - side * 0.42,
+            winY - 0.43, winZ,
+            balconyMat, row
+          );
+        }
+      }
+    }
+
+    // Ground-floor shop
+    box(
+      0.14, 2.5, d * 0.68,
+      faceX - side * 0.08, 1.35, 0,
+      shopMat, row
+    );
+
+    // Warm shop display windows
+    for (let s = -1; s <= 1; s++) {
+      box(
+        0.12, 1.25, 1.4,
+        faceX - side * 0.16, 1.25, s * 2,
+        signMat, row
+      );
+    }
+
+    // Shop canopy
+    box(
+      0.85, 0.16, d * 0.76,
+      faceX - side * 0.35, 2.75, 0,
+      material(0x263e55), row
+    );
+
+    // Rooftop architectural detail
+    box(
+      w * 0.58, 0.35, d * 0.48,
+      x, h + 0.18, 0,
+      balconyMat, row
+    );
+
+    // Streetlight pole
+    box(
+      0.13, 4.1, 0.13,
+      side * 8.1, 2.05, 0,
+      poleMat, row
+    );
+
+    box(
+      0.85, 0.12, 0.12,
+      side * 7.75, 4.05, 0,
+      poleMat, row
+    );
+
+    box(
+      0.4, 0.13, 0.28,
+      side * 7.4, 4.0, 0,
+      lampMat, row
+    );
+
+    // Decorative trees
+    if (Math.random() > 0.25) {
+      const treeX = side * 8.8;
+
+      const trunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.16, 0.22, 1.7, 8),
+        trunkMat
+      );
+      trunk.position.set(treeX, 0.85, 5);
+      row.add(trunk);
+
+      const leaves = new THREE.Mesh(
+        new THREE.SphereGeometry(0.95, 10, 8),
+        leafMat
+      );
+      leaves.position.set(treeX, 2.25, 5);
+      row.add(leaves);
+
+      // Planter
+      box(
+        1.25, 0.45, 1.25,
+        treeX, 0.23, 5,
+        material(0x626e70), row
+      );
+    }
+  }
+
+  cityRows.push(row);
+}
+
+for (let z = 5; z > -410; z -= 22) {
+  makeCityRow(z);
+}
+
 
     
             // Detailed building windows
