@@ -128,19 +128,39 @@ function makeCityRow(z) {
       row
     );
 
-    // Building windows
-    for (let floor = 1; floor < h / 2; floor += 2) {
-      for (let col = 0; col < 2; col++) {
-        box(
-          0.8, 0.7, 0.08,
-          x - w / 2 + 1.3 + col * (w - 2.6),
-          floor * 2.1,
-          d / 2 + 0.05,
-          winMat,
-          row
-        );
-      }
-    }
+    
+            // Detailed building windows
+            const winMat = material(0x8ce8ff);
+            const darkWinMat = material(0x172b3b);
+            
+            for (let floor = 1; floor < h / 2; floor += 2) {
+              for (let col = 0; col < 2; col++) {
+                const winX = x - w / 2 + 1.3 + col * (w - 2.6);
+                const winY = floor * 2.1;
+                
+                // Dark window frame
+                box(
+                  1.05, 1.15, 0.12,
+                  winX, winY, d / 2 + 0.05,
+                  darkWinMat, row
+                );
+                
+                // Bright glass
+                box(
+                  0.82, 0.9, 0.14,
+                  winX, winY, d / 2 + 0.13,
+                  winMat, row
+                );
+                
+                // Balcony ledge
+                box(
+                  1.45, 0.12, 0.45,
+                  winX, winY - 0.68, d / 2 + 0.25,
+                  poleMat, row
+                );
+              }
+            }
+
 
     // Streetlights beside the road
     box(0.14, 4.5, 0.14, side * 8.1, 2.25, 0, poleMat, row);
